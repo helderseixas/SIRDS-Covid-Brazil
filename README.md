@@ -15,15 +15,15 @@ If you wish to reproduce the process of generating the dataset, please refer to 
 
 2. Plot Charts
 
-Execute the notebooks 03_plot_covid_charts and 04_plot_mobility_chart to generate the charts presented in the paper.
+Execute the notebooks 03_plot_covid_charts, 04_plot_mobility_chart, and 05_plot_vaccination_chart to generate the charts presented in the paper.
 
 3. Optimization Simulations
 
-To run the optimization simulations, execute the notebook 05_optimization_national_sirds.
+To run the optimization simulations, execute the notebook 06_optimization_national_sirds.
 
 4. Analyze the Results
 
-To analyze the results and generate the charts presented in the paper, execute the notebook 06_analysis_national_sirds_results.
+To analyze the results and generate the charts presented in the paper, execute the notebook 07_analysis_national_sirds_results.
 
 ## Contributors
 
