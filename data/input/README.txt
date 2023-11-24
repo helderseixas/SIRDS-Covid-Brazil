@@ -22,9 +22,16 @@ To efficiently organize your input files, please adhere to the following guideli
 2. Extract the contents of the ZIP file to reveal files named "202*_BR_Region_Mobility_Report.csv".
 3. Move these mobility data files to a dedicated folder named "data/input/mobility".
 
-**Step 5: COVID-19 Data about Many Countries**
+**Step 5: COVID-19 Data about Other Countries**
 
 1. Download the desired file from the following link: https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv.
 2. Place this file in the specified directory labeled "data/input/OurWorldData".
+
+**Step 6: Covid-19 variant data from GISAID***
+
+1. Register and require access to GISAID databases at https://gisaid.org/.
+2. Login in your GISAID acount.
+3. Download the file 'Variants VoC/Vol (xlsx)' browsing by EpiCoV -> Downloads.
+4. Place this file in "data/input".
 
 Upon meticulously following these steps, your input files will be systematically organized within their respective folders, all set for further processing and analysis. This organized structure will streamline your workflow and contribute to a smoother data processing experience.
