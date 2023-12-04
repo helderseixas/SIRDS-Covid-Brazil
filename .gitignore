@@ -1,3 +1,5 @@
 # Default ignored files
 /.idea
 /data/input/OurWorldData/owid-covid-data.csv
+/data/input/tabnet/
+/data/output/df_sirds.csv

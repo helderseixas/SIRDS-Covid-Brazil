@@ -138,22 +138,55 @@ def calculate_performance(real_new_deaths, D_new_deaths, real_reproduction_numbe
     if train_period is None:
         train_period = len(real_new_deaths)
 
-    D_fitted = D_new_deaths[:train_period-1]
-    real_new_deaths_fitted = real_new_deaths[1:train_period]
+    if len(D_new_deaths) < len(real_new_deaths):
+        D_fitted = D_new_deaths[:train_period-1]
+        real_new_deaths_fitted = real_new_deaths[1:train_period]
+    else:
+        D_fitted = D_new_deaths[1:train_period]
+        real_new_deaths_fitted = real_new_deaths[1:train_period]
+
     reproduction_number_sird_fitted = reproduction_number_sird[:train_period]
     real_reproduction_number_fitted = real_reproduction_number[:train_period]
     mae_fit, sse_D_fit, r2_D_fit, sse_Rt_fit, r2_Rt_fit = _calculate_performance(
         real_new_deaths_fitted, D_fitted, real_reproduction_number_fitted, reproduction_number_sird_fitted)
 
     if train_period < len(real_new_deaths):
-        D_predicted = D_new_deaths[train_period-1:]
+        if len(D_new_deaths) < len(real_new_deaths):
+            D_predicted = D_new_deaths[train_period-1:]
+        else:
+            D_predicted = D_new_deaths[train_period:]
         real_new_deaths_predicted = real_new_deaths[train_period:]
-        reproduction_number_sird_predicted = reproduction_number_sird[train_period:]
+        D_predicted = D_predicted[:len(real_new_deaths_predicted)]
+
         real_reproduction_number_predicted = real_reproduction_number[train_period:]
-        print('\n***Forecasting***')
+        reproduction_number_sird_predicted = reproduction_number_sird[train_period:]
+        reproduction_number_sird_predicted = reproduction_number_sird_predicted[:len(real_reproduction_number_predicted)]
+
         mae_predicton, sse_D_predicton, r2_D_predicton, sse_Rt_predicton, r2_Rt_predicton = _calculate_performance(
-            real_new_deaths_predicted, D_predicted, real_reproduction_number_predicted,reproduction_number_sird_predicted)
-        return mae_fit, sse_D_fit, r2_D_fit, sse_Rt_fit, r2_Rt_fit, mae_predicton, sse_D_predicton, r2_D_predicton, sse_Rt_predicton, r2_Rt_predicton
+            real_new_deaths_predicted, D_predicted, real_reproduction_number_predicted, reproduction_number_sird_predicted)
+
+        real_new_deaths_predicted_month_1 = real_new_deaths_predicted[:30]
+        D_predicted_month_1 = D_predicted[:30]
+        real_reproduction_number_predicted_month_1 = real_reproduction_number_predicted[:30]
+        reproduction_number_sird_predicted_month_1 = reproduction_number_sird_predicted[:30]
+        mae_predicton_month_1, sse_D_predicton_month_1, r2_D_predicton_month_1, sse_Rt_predicton_month_1, r2_Rt_predicton_month_1 = _calculate_performance(
+            real_new_deaths_predicted_month_1, D_predicted_month_1, real_reproduction_number_predicted_month_1, reproduction_number_sird_predicted_month_1)
+
+        real_new_deaths_predicted_month_2 = real_new_deaths_predicted[30:60]
+        D_predicted_month_2 = D_predicted[:30]
+        real_reproduction_number_predicted_month_2 = real_reproduction_number_predicted[30:60]
+        reproduction_number_sird_predicted_month_2 = reproduction_number_sird_predicted[30:60]
+        mae_predicton_month_2, sse_D_predicton_month_2, r2_D_predicton_month_2, sse_Rt_predicton_month_2, r2_Rt_predicton_month_2 = _calculate_performance(
+            real_new_deaths_predicted_month_2, D_predicted_month_2, real_reproduction_number_predicted_month_2, reproduction_number_sird_predicted_month_2)
+
+        real_new_deaths_predicted_month_3 = real_new_deaths_predicted[30:60]
+        D_predicted_month_3 = D_predicted[:30]
+        real_reproduction_number_predicted_month_3 = real_reproduction_number_predicted[30:60]
+        reproduction_number_sird_predicted_month_3 = reproduction_number_sird_predicted[30:60]
+        mae_predicton_month_3, sse_D_predicton_month_3, r2_D_predicton_month_3, sse_Rt_predicton_month_3, r2_Rt_predicton_month_3 = _calculate_performance(
+            real_new_deaths_predicted_month_3, D_predicted_month_3, real_reproduction_number_predicted_month_3, reproduction_number_sird_predicted_month_3)
+
+        return mae_fit, sse_D_fit, r2_D_fit, sse_Rt_fit, r2_Rt_fit, mae_predicton, sse_D_predicton, r2_D_predicton, sse_Rt_predicton, r2_Rt_predicton, mae_predicton_month_1, sse_D_predicton_month_1, r2_D_predicton_month_1, sse_Rt_predicton_month_1, r2_Rt_predicton_month_1, mae_predicton_month_2, sse_D_predicton_month_2, r2_D_predicton_month_2, sse_Rt_predicton_month_2, r2_Rt_predicton_month_2, mae_predicton_month_3, sse_D_predicton_month_3, r2_D_predicton_month_3, sse_Rt_predicton_month_3, r2_Rt_predicton_month_3
     else:
         return mae_fit, sse_D_fit, r2_D_fit, sse_Rt_fit, r2_Rt_fit
 
@@ -165,9 +198,7 @@ def show_performance(dict_performance):
 
 def plot_result(df_S, df_I, df_R, df_D, df_new_deaths, df_I_accumulated, real_new_deaths, real_total_deaths,
                 real_reproduction_number, df_rt,
-                real_total_cases, real_new_cases, df_new_cases, dates,
-                epidemic_periods_with_fast_transition_fuzzy_variable,
-                epidemic_periods_with_slow_transition_fuzzy_variable, directory_to_save='images',
+                real_total_cases, real_new_cases, df_new_cases, dates, directory_to_save='images',
                 id_in_file='', max_date_to_fit=None):
 
     mask_date = mdates.DateFormatter('%m/%Y')
