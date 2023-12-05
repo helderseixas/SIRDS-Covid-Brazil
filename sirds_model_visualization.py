@@ -308,6 +308,98 @@ def plot_result(df_S, df_I, df_R, df_D, df_new_deaths, df_I_accumulated, real_ne
     img.save(filename+"_compressed.tiff", compression="tiff_lzw")
     plt.show()
 
+def plot_outbreak_result(dict_outbreak_S,
+                         dict_outbreak_I,
+                         dict_outbreak_R,
+                         dict_outbreak_D,
+                         dict_outbreak_rt,
+                         dict_outbreak_new_deaths,
+                         dict_max_date_to_fit,
+                         real_reproduction_number,
+                         real_new_deaths):
+    mask_date = mdates.DateFormatter('%m/%Y')
+    line_styles = ['-', '--', ':', '-.', '-']
+    plt.rc('font', size=8)
+    sns.set_style("ticks")
+    sns.set_palette(util.get_default_colors_categorical_seaborn())
+
+    fig, ax = plt.subplots(9, 3, figsize=(util.centimeter_to_inch(19.05), util.centimeter_to_inch(22.23)), sharex=True)
+
+    outbreaks = dict_outbreak_S.keys()
+    for outbreak in outbreaks:
+        outbreak = int(outbreak)
+        df_S = dict_outbreak_S[outbreak]
+        df_I = dict_outbreak_I[outbreak]
+        df_R = dict_outbreak_R[outbreak]
+        df_D = dict_outbreak_D[outbreak]
+        max_date_to_fit = dict_max_date_to_fit[outbreak]
+
+        dates = df_S.date.unique()
+        if len(real_reproduction_number) < len(dates):
+            dates = dates[:len(real_reproduction_number)]
+
+        # Chart 0: SIRDS output
+        sns.lineplot(x=df_S['date'], y=df_S['S'], label='S',
+                     color=util.get_default_colors_categorical_seaborn()[1], legend=outbreak==0,
+                     linestyle=line_styles[0], ax=ax[outbreak][0], errorbar=('ci', 95))
+        sns.lineplot(x=df_I['date'], y=df_I['I'], label='I',
+                     color=util.get_default_colors_categorical_seaborn()[2], legend=outbreak==0,
+                     linestyle=line_styles[1], ax=ax[outbreak][0], errorbar=('ci', 95))
+        sns.lineplot(x=df_R['date'], y=df_R['R'], label='R',
+                     color=util.get_default_colors_categorical_seaborn()[4], legend=outbreak==0,
+                     linestyle=line_styles[2], ax=ax[outbreak][0], errorbar=('ci', 95))
+        sns.lineplot(x=df_D['date'], y=df_D['D'], label='D',
+                     color=util.get_default_colors_categorical_seaborn()[3], legend=outbreak==0,
+                     linestyle=line_styles[3], ax=ax[outbreak][0], errorbar=('ci', 95))
+        ax[outbreak][0].axvline(max_date_to_fit, 0, 1, linestyle=':', color='gray')
+        ax[outbreak][0].set_ylabel('Outbreak '+str(outbreak)+'\nPopulation')
+        ax[outbreak][0].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+
+        if outbreak == 0:
+            ax[outbreak][0].set_title('a) SIRDS Simulation')
+            ax[outbreak][0].legend(ncol=4, loc='upper center', bbox_to_anchor=(0.3, 1.75))
+
+        # Chart 1: Rt
+        df_rt = dict_outbreak_rt[outbreak]
+        sns.lineplot(x=dates, y=real_reproduction_number[:len(dates)], label='Original data', legend=outbreak==0, linestyle=line_styles[0],
+                     ax=ax[outbreak][1])
+        sns.lineplot(x=df_rt['date'], y=df_rt['rt'], label='Simulation', legend=outbreak==0, linestyle=line_styles[1],
+                     ax=ax[outbreak][1], errorbar=('ci', 95))
+        ax[outbreak][1].axvline(max_date_to_fit, 0, 1, linestyle=':', color='gray')
+        ax[outbreak][1].axhline(1, 0, 1, linestyle='--', color='red')
+        ax[outbreak][1].set_ylabel('$R_{t}$')
+        if outbreak == 0:
+            ax[outbreak][1].set_title('b) Effective reproduction number ($R_t$)')
+            ax[outbreak][1].legend(ncol=2, loc='upper center', bbox_to_anchor=(0.5, 1.75))
+
+        # Chart 2: Deaths
+        df_new_deaths = dict_outbreak_new_deaths[outbreak]
+        sns.lineplot(x=dates, y=real_new_deaths[:len(dates)], label='Original data', legend=outbreak==0, linestyle=line_styles[0],
+                     ax=ax[outbreak][2])
+        sns.lineplot(x=df_new_deaths['date'], y=df_new_deaths['deaths'], label='Simulation', legend=outbreak==0,
+                     linestyle=line_styles[1],
+                     ax=ax[outbreak][2], errorbar=('ci', 95))
+        ax[outbreak][2].axvline(max_date_to_fit, 0, 1, linestyle=':', color='gray')
+        ax[outbreak][2].set_ylabel('Death rate')
+        if outbreak == 0:
+            ax[outbreak][2].set_title('c) New deaths')
+            ax[outbreak][2].legend(ncol=2, loc='upper center', bbox_to_anchor=(0.5, 1.75))
+
+        # General
+        if outbreak == len(outbreaks) -1:
+            for i in range(3):
+                ax[outbreak][i].set_xlabel('Month/Year')
+                ax[outbreak][i].xaxis.set_major_formatter(mask_date)
+                ax[outbreak][i].tick_params(axis='x', labelrotation=90)
+
+    fig.tight_layout()
+    filename = 'images/outbreak_result_output'
+    plt.savefig(filename+'.pdf', bbox_inches="tight")
+    plt.savefig(filename+'.tiff', format='tiff', dpi=300, transparent=False, bbox_inches='tight')
+    img = Image.open(filename+".tiff")
+    img.save(filename+"_compressed.tiff", compression="tiff_lzw")
+    plt.show()
+
 def plot_fuzzy_variables(dates, list_fuzzy_fast_transition_variable, list_fuzzy_slow_transition_variable, country):
     myFmt = mdates.DateFormatter('%m/%Y')
     plt.rc('font', size=6)
