@@ -323,7 +323,7 @@ def plot_outbreak_0_result(dict_outbreak_S,
     sns.set_style("ticks")
     sns.set_palette(util.get_default_colors_categorical_seaborn())
 
-    fig, ax = plt.subplots(6, 3, figsize=(util.centimeter_to_inch(19.05), util.centimeter_to_inch(19.05)), sharex=True)
+    fig, ax = plt.subplots(8, 3, figsize=(util.centimeter_to_inch(19.05), util.centimeter_to_inch(22.23)), sharex=True)
 
     list_days_to_fit = dict_outbreak_S.keys()
     for j, days_to_fit in enumerate(list_days_to_fit):
@@ -352,7 +352,15 @@ def plot_outbreak_0_result(dict_outbreak_S,
                      color=util.get_default_colors_categorical_seaborn()[3], legend=days_to_fit==0,
                      linestyle=line_styles[3], ax=ax[j][0], errorbar=('ci', 95))
         ax[j][0].axvline(max_date_to_fit, 0, 1, linestyle=':', color='gray')
-        ax[j][0].set_ylabel('Days to fit = '+str(days_to_fit)+'\nPopulation')
+        if str(days_to_fit)[-1] == '1':
+            ordinal_symbol = '$^{st}$'
+        elif str(days_to_fit)[-1] == '2':
+            ordinal_symbol = '$^{nd}$'
+        elif str(days_to_fit)[-1] == '3':
+            ordinal_symbol = '$^{rd}$'
+        else:
+            ordinal_symbol = '$^{th}$'
+        ax[j][0].set_ylabel(str(days_to_fit)+ordinal_symbol+' day\nPopulation')
         ax[j][0].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: format(int(x), ',')))
 
         if j == 0:
