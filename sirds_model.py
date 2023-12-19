@@ -747,8 +747,10 @@ def get_error_deaths_rt(SIRDS_new_deaths,
             :len(SIRDS_effective_reproduction_number)] = SIRDS_effective_reproduction_number
             resized_SIRDS_effective_reproduction_number = np.nan_to_num(resized_SIRDS_effective_reproduction_number,
                                                                         nan=0)
-            mae_rt = mean_absolute_error(real_effective_reproduction_number,
-                                         resized_SIRDS_effective_reproduction_number)
+        else:
+            resized_SIRDS_effective_reproduction_number = SIRDS_effective_reproduction_number[:len(real_effective_reproduction_number)]
+        mae_rt = mean_absolute_error(real_effective_reproduction_number,
+                                     resized_SIRDS_effective_reproduction_number)
 
     error = mae_deaths / real_new_deaths[1:].mean() + mae_rt / real_effective_reproduction_number.mean()
 

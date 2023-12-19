@@ -95,19 +95,24 @@ def get_sirds_extras(result, S, D, I_accumulated):
             estimated_loss_immunity_in_days)
 
 def _calculate_performance(real_new_deaths, D_new_deaths, real_reproduction_number, reproduction_number_sird):
-    mae = get_error_deaths_rt(D_new_deaths,
-                        real_new_deaths,
-                        reproduction_number_sird,
-                        real_reproduction_number)
+    if len(real_reproduction_number[~np.isnan(real_reproduction_number)]) > 0:
+        mae = get_error_deaths_rt(D_new_deaths,
+                            real_new_deaths,
+                            reproduction_number_sird,
+                            real_reproduction_number)
+
+        indices_to_remove = np.argwhere(np.isnan(real_reproduction_number))
+        real_reproduction_number = np.delete(real_reproduction_number, indices_to_remove)
+        reproduction_number_sird_train = np.delete(reproduction_number_sird, indices_to_remove)
+        sse_Rt = mean_squared_error(real_reproduction_number, reproduction_number_sird_train)
+        r2_Rt = r2_score(real_reproduction_number, reproduction_number_sird_train)
+    else:
+        mae = None
+        sse_Rt = None
+        r2_Rt = None
 
     sse_D = mean_squared_error(D_new_deaths, real_new_deaths)
     r2_D = r2_score(D_new_deaths, real_new_deaths)
-
-    indices_to_remove = np.argwhere(np.isnan(real_reproduction_number))
-    real_reproduction_number = np.delete(real_reproduction_number, indices_to_remove)
-    reproduction_number_sird_train = np.delete(reproduction_number_sird, indices_to_remove)
-    sse_Rt = mean_squared_error(real_reproduction_number, reproduction_number_sird_train)
-    r2_Rt = r2_score(real_reproduction_number, reproduction_number_sird_train)
 
     return mae, sse_D, r2_D, sse_Rt, r2_Rt
 
@@ -173,18 +178,18 @@ def calculate_performance(real_new_deaths, D_new_deaths, real_reproduction_numbe
             real_new_deaths_predicted_month_1, D_predicted_month_1, real_reproduction_number_predicted_month_1, reproduction_number_sird_predicted_month_1)
 
         real_new_deaths_predicted_month_2 = real_new_deaths_predicted[30:60]
-        D_predicted_month_2 = D_predicted[:30]
+        D_predicted_month_2 = D_predicted[30:60]
         real_reproduction_number_predicted_month_2 = real_reproduction_number_predicted[30:60]
         reproduction_number_sird_predicted_month_2 = reproduction_number_sird_predicted[30:60]
         mae_predicton_month_2, sse_D_predicton_month_2, r2_D_predicton_month_2, sse_Rt_predicton_month_2, r2_Rt_predicton_month_2 = _calculate_performance(
             real_new_deaths_predicted_month_2, D_predicted_month_2, real_reproduction_number_predicted_month_2, reproduction_number_sird_predicted_month_2)
 
-        real_new_deaths_predicted_month_3 = real_new_deaths_predicted[30:60]
-        D_predicted_month_3 = D_predicted[:30]
-        real_reproduction_number_predicted_month_3 = real_reproduction_number_predicted[30:60]
-        reproduction_number_sird_predicted_month_3 = reproduction_number_sird_predicted[30:60]
-        mae_predicton_month_3, sse_D_predicton_month_3, r2_D_predicton_month_3, sse_Rt_predicton_month_3, r2_Rt_predicton_month_3 = _calculate_performance(
-            real_new_deaths_predicted_month_3, D_predicted_month_3, real_reproduction_number_predicted_month_3, reproduction_number_sird_predicted_month_3)
+        real_new_deaths_predicted_month_3 = real_new_deaths_predicted[60:]
+        D_predicted_month_3 = D_predicted[60:]
+        real_reproduction_number_predicted_month_3 = real_reproduction_number_predicted[60:]
+        reproduction_number_sird_predicted_month_3 = reproduction_number_sird_predicted[60:]
+        mae_predicton_month_3, sse_D_predicton_month_3, r2_D_predicton_month_3, sse_Rt_predicton_month_3, r2_Rt_predicton_month_3 = (
+                _calculate_performance(real_new_deaths_predicted_month_3, D_predicted_month_3, real_reproduction_number_predicted_month_3, reproduction_number_sird_predicted_month_3))
 
         return mae_fit, sse_D_fit, r2_D_fit, sse_Rt_fit, r2_Rt_fit, mae_predicton, sse_D_predicton, r2_D_predicton, sse_Rt_predicton, r2_Rt_predicton, mae_predicton_month_1, sse_D_predicton_month_1, r2_D_predicton_month_1, sse_Rt_predicton_month_1, r2_Rt_predicton_month_1, mae_predicton_month_2, sse_D_predicton_month_2, r2_D_predicton_month_2, sse_Rt_predicton_month_2, r2_Rt_predicton_month_2, mae_predicton_month_3, sse_D_predicton_month_3, r2_D_predicton_month_3, sse_Rt_predicton_month_3, r2_Rt_predicton_month_3
     else:
